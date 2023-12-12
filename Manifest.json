@@ -1,0 +1,78 @@
+{
+  "name": "ROLLHELPER - Extension",
+  "description": "Helping the traders on csgoroll.com",
+  "version": "1.0.0",
+  "author": "https://github.com/0xM14N/",
+  "manifest_version": 3,
+  "icons": {
+    "16": "assets/ico/coin-ico.png",
+    "32": "assets/ico/coin-ico.png",
+    "48": "assets/ico/coin-ico-large.png",
+    "128": "assets/ico/coin-ico-large.png"
+  },
+  "background": {
+    "service_worker": "assets/js/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.csgoroll.com/*",
+        "https://www.csgoroll.gg/*",
+        "https://www.csgorolltr.com/*"
+      ],
+      "js": [
+        "assets/js/content.js",
+        "assets/js/buttons.js",
+        "assets/js/js-resources/loggerStyles.js",
+        "assets/js/js-resources/templateWebhook.js",
+        "assets/js/payloads/ProcessTradePayload.js",
+        "assets/js/payloads/createTradePayload.js",
+        "assets/js/storage/update.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://www.csgoroll.com/en/top-up/steam/csgo",
+        "https://www.csgoroll.gg/en/top-up/steam/csgo",
+        "https://www.csgorolltr.com/en/top-up/steam/csgo",
+        "https://www.csgoroll.com/en/withdraw/csgo/p2p",
+        "https://www.csgoroll.gg/en/withdraw/csgo/p2p",
+        "https://www.csgorolltr.com/en/withdraw/csgo/p2p"
+      ],
+      "js": ["assets/js/pricing.js"],
+      "css": ["assets/css/depositPage.css"]
+    },
+    {
+      "matches": [
+        "https://www.csgoroll.com/en/crash",
+        "https://www.csgoroll.gg/en/crash",
+        "https://www.csgorolltr.com/en/crash"
+      ],
+      "js": ["assets/js/crash.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "assets/popup/popup.html",
+    "scripts": ["assets/popup/popup.js"],
+    "default_icon": {
+      "16": "assets/ico/coin-ico.png"
+    }
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.csgoroll.com/*",
+    "https://www.csgorolltr.com/*",
+    "https://www.csgoroll.gg/*",
+    "https://prices.csgotrader.app/latest/prices_v6.json"
+  ],
+  "web_accessible_resources": [{
+    "matches": ["<all_urls>"],
+    "resources": [
+      "assets/js/rates.json",
+      "assets/ico/pelogo.png",
+      "assets/ico/cstlogo.png"]
+  }]
+}
