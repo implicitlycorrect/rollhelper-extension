@@ -1,4 +1,4 @@
-const updateSettings = () => {
+const updateSettings = async() => {
     chrome.storage.sync.get(["steamOfferMessage"]).then((res)=>{
         offerMessage = res.steamOfferMessage
     })

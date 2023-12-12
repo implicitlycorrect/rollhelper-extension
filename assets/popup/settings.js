@@ -32,14 +32,6 @@ saveBtn.addEventListener('click', function(){
         });
     }
 
-    // if (tokenValue != '' && userkeyValue != '') {
-    //     chrome.tabs.query({currentWindow: true, active: true}, function (tabs){
-    //         var activeTab = tabs[0];
-    //         chrome.tabs.sendMessage(activeTab.id, {token: tokenValue, userkey: userkeyValue});
-    //     });
-    // }
-
-
     if (tokenValue != '') {
         chrome.storage.sync.set({
             token: tokenValue

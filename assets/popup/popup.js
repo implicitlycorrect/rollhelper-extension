@@ -3,7 +3,6 @@ let switchDepo = document.getElementById('depoSwitch');
 let sendOfferSwitch = document.getElementById('sendOfferSwitch')
 let steamMsgInput = document.getElementById('steamOfferMessageInput')
 
-
 document.addEventListener('DOMContentLoaded', function () {
     restoreOptions();
 });
@@ -11,14 +10,16 @@ document.addEventListener('DOMContentLoaded', function () {
 saveBtn.addEventListener('click', function(){
     let offerMessageValue = steamMsgInput.value
 
-    chrome.storage.sync.set({
-        steamOfferMessage: offerMessageValue
-    });
+    if (offerMessageValue != '') {
+        chrome.storage.sync.set({
+            steamOfferMessage: offerMessageValue
+        });
 
-    chrome.tabs.query({currentWindow: true, active: true}, function (tabs){
-        var activeTab = tabs[0];
-        chrome.tabs.sendMessage(activeTab.id, {steamOfferMessage: offerMessage});
-    });
+        // chrome.tabs.query({currentWindow: true, active: true}, function (tabs){
+        //     var activeTab = tabs[0];
+        //     chrome.tabs.sendMessage(activeTab.id, {steamOfferMessage: offerMessage});
+        // });
+    }
 
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs){
         var activeTab = tabs[0];

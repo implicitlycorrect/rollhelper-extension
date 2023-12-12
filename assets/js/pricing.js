@@ -1,9 +1,9 @@
-const initInjectUsdPrice = () => {
-    const depoItems = document.getElementsByTagName('cw-deposit-listed')
-    for (const node of depoItems) {
-        injectUsdPrice(node)
-    }
-}
+// const initInjectUsdPrice = () => {
+//     const depoItems = document.getElementsByTagName('cw-deposit-listed')
+//     for (const node of depoItems) {
+//         injectUsdPrice(node)
+//     }
+// }
 
 // const look4InjectUsdPrice = setInterval(()=>{
 //     const depoScrollable = document.getElementsByClassName('trade-list')[0]

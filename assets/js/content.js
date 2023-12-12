@@ -2,7 +2,6 @@
 console.log(`%c[ROLLHELPER - EXTENSION]`, "color:#e0e0e0;font-weight: bold; font-size:23px")
 // console.log(`%cIf you enocunter any issues / bugs or just have suggestions for the addon, you can email me at: rollhelperdeveloper@gmail.com`,
 //     "color:#e0e0e0;font-weight: normal; font-size:15px")
-
 const kniveTypes = ["knife","karambit","bayonet","daggers"]
 let itemID
 let userID
@@ -17,6 +16,7 @@ chrome.runtime.sendMessage({type: 'getActiveRollUrls'}, async response => {
     if (csgorollUrlCount === 1) {
         await getUserID()
         getCurrentSteamInvData()
+        await updateSettings()
         connectWSS()
     }else{
         console.log(`%cRollHelper websocket connection runs in different tab!`,"color:#e0e0e0;font-weight: normal; font-size:15px")
@@ -158,6 +158,7 @@ chrome.storage.sync.get(["peApi"]).then((res) => {
     if (peApiKey != undefined){
         loadPriceDataPricempire()
     } else {
+        loadPriceDataPricempire()
         //loadPriceDataCSGOTRADER()
     }
 });
@@ -241,14 +242,17 @@ function connectWSS(){
                     let profit;
                     let rate;
                     let eval_res = buffProfitEval(marketName, value, 'deposit') // [usd, profit]
-                    if (eval_res !== -1000 || eval_res !== -999) {
+
+                    if (eval_res) {
                         usd = eval_res[0];
                         profit = eval_res[1];
                         rate = eval_res[2];
                         coinsToUsd = (value*rate).toFixed(2);
                     }else {
-                         usd = '[error]';
-                         profit = '[error]';
+                        usd = '[-]';
+                        profit = '[-]';
+                        coinsToUsd = '[-]'
+                        rate = '[-]'
                     }
                     const encodedItemName = encodeURIComponent(marketName).replace(/\(/g, '%28').replace(/\)/g, '%29');
                     const buffUrl = "https://api.pricempire.com/v1/redirectBuff/" + encodedItemName;
@@ -292,14 +296,16 @@ function connectWSS(){
                     }
 
                     let eval_res = buffProfitEval(marketName, value) // [usd, profit, rate]
-                    if (eval_res !== -1000 || eval_res !== -999) {
+                    if (eval_res) {
                         usd = eval_res[0];
                         profit = eval_res[1];
                         rate = eval_res[2]
                         coinsToUsd = (value*rate).toFixed(2);
                     }else {
-                         usd = '[-]';
-                         profit = '[-]';
+                        usd = '[-]';
+                        profit = '[-]';
+                        coinsToUsd = '[-]'
+                        rate = '[-]'
                     }
                     console.log(`%c${DateFormater(new Date())} | [WITHDRAW - WAITING]\n\t${marketName}\n\t${value} coins | (${markup}%) | ${coinsToUsd}$\n\t[FV]: ${float} | [MAX MARKUP]: ${maxMarkup}%\n\tROLLNAME: ${rollName}\n\tRollID: ${rollID}\n\t[BUFF163]: ${usd}$ (RATE: ${rate})\n\t[Price-Of-BUFF]: ${profit}%`,noticeCSSlog)
                 }
@@ -332,14 +338,16 @@ function connectWSS(){
                 }
 
                 let eval_res = buffProfitEval(marketName, value) // [usd, profit]
-                if (eval_res !== -1000 || eval_res !== -999) {
+                if (eval_res) {
                      usd = eval_res[0];
                      profit = eval_res[1];
                      rate = eval_res[2];
                      coinsToUsd = (value*rate).toFixed(2);
                 }else {
-                     usd = null;
-                     profit = null;
+                    usd = '[-]';
+                    profit = '[-]';
+                    coinsToUsd = '[-]'
+                    rate = '[-]'
                 }
 
                 console.log(`%c${DateFormater(new Date())} | [TRADE - COMPLETED]\n\t${marketName}\n\t${value} coins | (${markup}%) | ${coinsToUsd}$\n\t[FV]: ${float} | [MAX MARKUP]: ${maxMarkup}%\n\t[BUFF163]: ${usd}$ (RATE: ${rate})\n\t[Price-Of-BUFF]: ${profit}%`,tradeCompletedCSSlog)
@@ -366,8 +374,8 @@ function connectWSS(){
                 }
             }
 
-            if(trade.withdrawer != null && trade.status === 'PROCESSING' && sendSteamOffers){
-                if (trade.depositor.id == userID) {
+            if(trade.withdrawer != null && trade.status === 'PROCESSING'){
+                if (trade.depositor.id == userID && sendSteamOffers) {
                     //send the steam offer here
                     let markup = trade.tradeItems[0].markupPercent;
                     let value = trade.tradeItems[0].value;
@@ -438,14 +446,16 @@ function connectWSS(){
                     }
 
                     let eval_res = buffProfitEval(marketName, value) // [usd, profit]
-                    if (eval_res !== -1000 || eval_res !== -999) {
+                    if (eval_res) {
                         usd = eval_res[0];
                         profit = eval_res[1];
                         rate = eval_res[2];
                         coinsToUsd = (value*rate).toFixed(2);
                     }else {
-                         usd = '[-]';
-                         profit = '[-]';
+                        usd = '[-]';
+                        profit = '[-]';
+                        coinsToUsd = '[-]'
+                        rate = '[-]'
                     }
                     const encodedItemName = encodeURIComponent(marketName).replace(/\(/g, '%28').replace(/\)/g, '%29');
                     const buffUrl = "https://api.pricempire.com/v1/redirectBuff/" + encodedItemName;
@@ -499,12 +509,12 @@ async function loadPriceDataPricempire(){
             provider = 'pricempire'
             console.log(`%c[PRICEMPIRE] -> Successfully loaded current price data`, pricempireCSSlog)
         }else{
-            console.log(`%c[PRICEMPIRE - ERROR] -> STATUS CODE: ${res.status} | ${res.statusText}`,pricempireCSSlog)
-            console.log(`%c[ROLLHELPER] -> LOADING FREE CSGOTRADER PRICES`, pricempireCSSlog)
+            console.log(`%c[PRICEMPIRE - ERROR] -> STATUS CODE: ${res.status}`,pricempireCSSlog)
+            console.log(`%c[ROLLHELPER] -> Enter Pricempire API KEY for pricing`, pricempireCSSlog)
             //loadPriceDataCSGOTRADER() // load backup provider
         }
     }catch(err){
-        console.log(`%[PRICEMPIRE - ERROR] -> Can't update the current price data`, pricempireCSSlog)
+        console.log(`%c[PRICEMPIRE - ERROR] -> Can't update the current price data`, pricempireCSSlog)
         //loadPriceDataCSGOTRADER()
     }
 }
