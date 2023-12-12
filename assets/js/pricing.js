@@ -33,9 +33,9 @@ async function addForm() {
                         setBuffValue(node);
                     }
 
-                    if (node instanceof HTMLElement && node.localName == 'cw-deposit-listed') {
-                        injectUsdPrice(node);
-                    }
+                    // if (node instanceof HTMLElement && node.localName == 'cw-deposit-listed') {
+                    //     injectUsdPrice(node);
+                    // }
                 }
             }
         }
