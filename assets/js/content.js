@@ -86,7 +86,11 @@ const getCurrentSteamInvData  =  () => {
                 getCurrentSteamInvData()
             }else{
                 console.log(`%c[ROLLHELPER] -> Successfully loaded tradable items from steam: (${itemsList.length})`,depositCSSlog)
-                document.getElementsByClassName('counterCoinButton')[0].innerHTML = Math.round(coinsCounter)
+                try{
+                    document.getElementsByClassName('counterCoinButton')[0].innerHTML = Math.round(coinsCounter)
+                }catch(err){
+                    //
+                }
             }
             //console.log(itemsList)
         })
@@ -660,7 +664,6 @@ const refactorDopplerNameForCSGOTR = (marketName) => {
     }
 }
 
-
 const evalMaxMarkup = (itemBasePrice, addedStickerValue) => {
   //  let addedStickerValue = (stickersValue / 5) //20
     let maxItemValue = (itemBasePrice + addedStickerValue)
@@ -668,7 +671,6 @@ const evalMaxMarkup = (itemBasePrice, addedStickerValue) => {
     if (maxMarkupPercent <= 12) return  12;
     return (maxMarkupPercent+12).toFixed(2);
 }
-
 
 const sendSteamTradeOffer = (assetID, tradeLink, offerMessage) => {
     chrome.runtime.sendMessage({

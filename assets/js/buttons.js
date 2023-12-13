@@ -36,7 +36,7 @@ const createPeLogoDiv = () => {
     const div = document.createElement('div')
     const img = document.createElement('img')
     const a = document.createElement('a')
-    a.href = 'https://pricempire.com/'
+    a.href = 'https://pricempire.com/r/rollhelper'
     a.target ='_blank'
     img.style.height = '35px'
     img.src = pelogo;
@@ -77,19 +77,19 @@ boxDiv = createButtonBox()
 const intWaitForProviderInt = setInterval(()=>{
     const mainHeader = document.querySelector("body > cw-root > cw-header > nav > div:nth-child(2)")
 
-    if (provider !== undefined && btnsRendered) {
+    if (btnsRendered) {
         clearInterval(intWaitForProviderInt)
-        switch(provider){
-            case 'pricempire':
-                mainHeader.appendChild(peDiv)
-                break;
-            case 'csgotrader':
-                mainHeader.appendChild(cstDiv)
-                break;
-        }
+        mainHeader.appendChild(peDiv)
+        // switch(provider){
+        //     case 'pricempire':
+        //         mainHeader.appendChild(peDiv)
+        //         break;
+        //     case 'csgotrader':
+        //         mainHeader.appendChild(cstDiv)
+        //         break;
+        // }
     }
 },90)
-
 const intFindPlaceForButtons = setInterval(async function() {
     const mainHeader = document.querySelector("body > cw-root > cw-header > nav > div:nth-child(2)")
 
