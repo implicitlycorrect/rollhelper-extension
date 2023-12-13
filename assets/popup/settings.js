@@ -51,7 +51,6 @@ saveBtn.addEventListener('click', function(){
         });
     }
 
-
     if (webhookValue != '') {
         chrome.storage.sync.set({
             webhook: webhookValue
@@ -123,16 +122,16 @@ cooldownSwitch.addEventListener('change', function(){
 
 dcNotify.addEventListener('change', function(){
     if(this.checked){
-        if (dcRow.classList.contains('displayNone')) {
-            dcRow.classList.remove('displayNone')
-        }
+        // if (dcRow.classList.contains('displayNone')) {
+        //     dcRow.classList.remove('displayNone')
+        // }
         chrome.storage.sync.set({
             dcNotifyState: true
         });
     } else{
-        if (!dcRow.classList.contains('displayNone')) {
-            dcRow.classList.add('displayNone')
-        }
+        // if (!dcRow.classList.contains('displayNone')) {
+        //     dcRow.classList.add('displayNone')
+        // }
         chrome.storage.sync.set({
             dcNotifyState: false
         });
@@ -180,7 +179,6 @@ depoAlertSwitch.addEventListener('change', function(){
 
 withdrawalSwitch.addEventListener('change', function(){
     if (this.checked) {
-
         chrome.tabs.query({currentWindow: true, active: true}, function (tabs){
             var activeTab = tabs[0];
             chrome.tabs.sendMessage(activeTab.id, {wantWithdrawalAlert: true});
@@ -204,7 +202,6 @@ withdrawalSwitch.addEventListener('change', function(){
         });
     }
 })
-
 
 
 function restoreOptions(){

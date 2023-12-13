@@ -32,7 +32,7 @@ somewhat accurate.
 
 ### Steam offer sender
 RollHELPER is using csgotrader's extension feature which has to be enabled  
-in order to work properly (*turn on "**Send offers based on query params"** under trade offer automation option*).
+in order to work properly (*turn on "**Send offers based on query params"**, **"Select item based on query params (autofill)"** and **Tabs API access** *).
 > **NOTICE:** I, nor anyone who has been ever using this feature for a rather longer period of time now, has never experienced any erros while sending the offers, I however have to warn you to use this feature on your own risk (if you are using automated steam confirmations), and always make sure to check if correct item has been sent.
 
 ### LOGS

@@ -1,5 +1,4 @@
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) =>
-{
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.type === 'getActiveRollUrls') {
         chrome.tabs.query({},function(tabs) {
             csgorollActiveUrls = 0
