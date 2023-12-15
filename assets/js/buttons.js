@@ -111,8 +111,8 @@ const intAddEventListeners = setInterval(async function(){
         clearInterval(intAddEventListeners)
         cancelBtn.addEventListener("click",function(){
             cancelNodes = [];
-            let confirm = confirm(`Are you sure?\nThis will mass DE-List all of your current deposits`)
-            if (confirm) {
+            let res = confirm(`Are you sure?\nThis will mass DE-List all of your current deposits`)
+            if (res) {
                 try {
                     var nodes = document.getElementsByClassName("mat-button-wrapper")
                     for (i = 0; i < nodes.length; i++) {
