@@ -53,4 +53,4 @@ in order to work properly (*turn on "**Send offers based on query params"**, **"
 
 ### Issues
 Iam aware that the extension has a lot of bugs / issues, so feel free to open github issue if 
-you find any :]
+you find any :] (Discord: m41n_. )
