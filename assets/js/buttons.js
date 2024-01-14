@@ -64,7 +64,6 @@ const createButtonBox = () => {
     const div = document.createElement('div')
     div.style.display = 'flex'
     div.style.flexDirection = 'column'
-   // div.style.margin = '1rem'
     return div
 }
 
@@ -80,14 +79,6 @@ const intWaitForProviderInt = setInterval(()=>{
     if (btnsRendered) {
         clearInterval(intWaitForProviderInt)
         mainHeader.appendChild(peDiv)
-        // switch(provider){
-        //     case 'pricempire':
-        //         mainHeader.appendChild(peDiv)
-        //         break;
-        //     case 'csgotrader':
-        //         mainHeader.appendChild(cstDiv)
-        //         break;
-        // }
     }
 },90)
 const intFindPlaceForButtons = setInterval(async function() {

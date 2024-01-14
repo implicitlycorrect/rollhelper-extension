@@ -1,55 +1,68 @@
-const updateSettings = async() => {
-    chrome.storage.sync.get(["steamOfferMessage"]).then((res)=>{
-        offerMessage = res.steamOfferMessage
-    })
+const updateSettings = async () => {
+    const [
+        { steamOfferMessage },
+        { wantSendOffers },
+        { wantCompletedAlert },
+        { wantCooldownAlert },
+        { dcNotifyState },
+        { wantWithdrawalAlert },
+        { wantDepoAlert },
+        { peApi },
+        { switchDepoState },
+        { switchNotifyState },
+        { token },
+        { userkey },
+        { webhook }
+    ] = await Promise.all([
+        chrome.storage.sync.get(["steamOfferMessage"]),
+        chrome.storage.sync.get(["wantSendOffers"]),
+        chrome.storage.sync.get(["wantCompletedAlert"]),
+        chrome.storage.sync.get(["wantCooldownAlert"]),
+        chrome.storage.sync.get(["dcNotifyState"]),
+        chrome.storage.sync.get(["wantWithdrawalAlert"]),
+        chrome.storage.sync.get(["wantDepoAlert"]),
+        chrome.storage.sync.get(["peApi"]),
+        chrome.storage.sync.get(["switchDepoState"]),
+        chrome.storage.sync.get(["switchNotifyState"]),
+        chrome.storage.sync.get(["token"]),
+        chrome.storage.sync.get(["userkey"]),
+        chrome.storage.sync.get(["webhook"])
+    ]);
 
-    chrome.storage.sync.get(["wantSendOffers"]).then((res)=>{
-        sendSteamOffers = res.wantSendOffers
-    })
-    chrome.storage.sync.get(["wantCompletedAlert"]).then((res)=>{
-        completedAlert = res.wantCompletedAlert
-    })
+    // UNCOMMENT TO DEBUG STORAGE ISSUES
+    // console.log('steamOfferMessage:', steamOfferMessage);
+    // console.log('wantSendOffers:', wantSendOffers);
+    // console.log('wantCompletedAlert:', wantCompletedAlert);
+    // console.log('wantCooldownAlert:', wantCooldownAlert);
+    // console.log('dcNotifyState:', dcNotifyState);
+    // console.log('wantWithdrawalAlert:', wantWithdrawalAlert);
+    // console.log('wantDepoAlert:', wantDepoAlert);
+    // console.log('peApi:', peApi);
+    // console.log('Autoaccept:', switchDepoState);
+    // console.log('Pushover:', switchNotifyState);
+    // console.log('token:', token);
+    // console.log('userkey:', userkey);
+    // console.log('webhook:', webhook);
 
-    chrome.storage.sync.get(["wantCooldownAlert"]).then((res)=>{
-        cooldownAlert = res.wantCooldownAlert
-    })
+    offerMessage = steamOfferMessage;
+    sendSteamOffers = wantSendOffers;
+    completedAlert = wantCompletedAlert;
+    cooldownAlert = wantCooldownAlert;
+    discord = dcNotifyState;
+    withdrawAlert = wantWithdrawalAlert;
+    depoAlert = wantDepoAlert;
+    peApiKey = peApi;
+    depoAutoAccept = switchDepoState;
+    Pushover = switchNotifyState;
+    Token = token;
+    Userkey = userkey;
+    Webhook = webhook;
 
-    chrome.storage.sync.get(["dcNotifyState"]).then((res)=>{
-        discord = res.dcNotifyState;
-    });
+};
 
-    chrome.storage.sync.get(["wantWithdrawalAlert"]).then((res) => {
-        withdrawAlert = res.wantWithdrawalAlert;
-    });
 
-    chrome.storage.sync.get(["wantDepoAlert"]).then((res) => {
-        depoAlert = res.wantDepoAlert;
-    });
 
-    chrome.storage.sync.get(["peApi"]).then((res) => {
-        peApiKey = res.peApi;
-    });
 
-    chrome.storage.sync.get(["switchDepoState"]).then((res) => {
-        depoAutoAccept = res.switchDepoState;
-    });
-
-    chrome.storage.sync.get(["switchNotifyState"]).then((res) => {
-        Pushover = res.switchNotifyState;
-    });
-
-    chrome.storage.sync.get(["token"]).then((res) => {
-        token = res.token;
-    });
-
-    chrome.storage.sync.get(["userkey"]).then((res) => {
-        userkey = res.userkey;
-    });
-
-    chrome.storage.sync.get(["webhook"]).then((res) => {
-        webhook = res.webhook;
-    });
-}
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg?.wantSendOffers !== undefined) {

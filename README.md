@@ -1,6 +1,6 @@
 # ROLLHELPER
 
-**RollHELPER** is chrome extension dedicated for the **csgoroll trading community**. It offers various functions which aims to help with trading on csgoroll all via user friendly extension popup.
+**RollHELPER** is chrome extension dedicated for the **csgoroll trading community**. It offers various functions which aim to help with trading on csgoroll.
 > **NOTICE**: Since the the support for csgotrader pricing api has been discontinued the extension offers no free in-built pricing option as of right now. (So you might want to support Pricempire :] )
 ## Current Features
 - Deposit autoaccept
@@ -15,8 +15,8 @@
     - Deposit
     - Withdraw
     - Cooldown
-    - Pricing
 - Detailed logs in devtools console
+    - Pricing
     - Item details
     - Buff163 USD price reference
     - Max markups
@@ -45,12 +45,16 @@ in order to work properly (*turn on "**Send offers based on query params"**, **"
 ![DepoWithdraw.png](assets/ico/showcase/DepoWithdraw.png)
 
 ## Installation
-> **DOWNLOAD:** Click green code button with arrow -> Download ZIP -> unzip the files somewhere on your pc
+
+#### GIT:
+`git clone https://github.com/0xM14N/rollhelper-extension`
+#### Zip download:
+> **DOWNLOAD:** Click green code button with arrow -> Download ZIP -> unzip the files somewhere
 1. Go to chrome://extensions
 2. Make sure 'Developer Mode' option is turned on (upper right corner)
 3. Click 'Load unpacked'
-4. Select the extension file you downloaded from git -> select the unzipped folder 'ROLLHELPER-public'
+4. Select and upload the extension file you unzipped (rollhelper-extension)
 
 ### Issues
 Iam aware that the extension has a lot of bugs / issues, so feel free to open github issue if 
-you find any :] (Discord: m41n_. )
+you find any :] CONTACT: Discord: m41n_. / rollhelperdeveloper@gmail.com

@@ -1,7 +1,7 @@
 {
   "name": "ROLLHELPER - Extension",
   "description": "Helping the traders on csgoroll.com",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "https://github.com/0xM14N/",
   "manifest_version": 3,
   "icons": {
@@ -21,15 +21,19 @@
         "https://www.csgorolltr.com/*"
       ],
       "js": [
-        "assets/js/content.js",
+        "assets/js/rollhelper.js",
         "assets/js/buttons.js",
-        "assets/js/js-resources/loggerStyles.js",
-        "assets/js/js-resources/templateWebhook.js",
+        "assets/js/utils/utils.js",
+        "assets/js/utils/loggerStyles.js",
         "assets/js/payloads/ProcessTradePayload.js",
         "assets/js/payloads/createTradePayload.js",
-        "assets/js/storage/update.js"
+        "assets/js/storage/update.js",
+        "assets/js/notifications/notifications.js",
+        "assets/js/requests/getUserData.js",
+        "assets/js/requests/getTradableItems.js"
       ]
     },
+
     {
       "matches": [
         "https://www.csgoroll.com/en/top-up/steam/csgo",
@@ -52,8 +56,8 @@
     }
   ],
   "action": {
-    "default_popup": "assets/popup/popup.html",
-    "scripts": ["assets/popup/popup.js"],
+    "default_popup": "assets/popup/html/popup.html",
+    "scripts": ["assets/popup/js/popup.js"],
     "default_icon": {
       "16": "assets/ico/coin-ico.png"
     }
@@ -71,7 +75,7 @@
   "web_accessible_resources": [{
     "matches": ["<all_urls>"],
     "resources": [
-      "assets/js/rates.json",
+      "assets/rates/rates.json",
       "assets/ico/pelogo.png",
       "assets/ico/cstlogo.png"]
   }]

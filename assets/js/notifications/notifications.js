@@ -1,5 +1,20 @@
+// Pushover notification
+var sendPushoverNotification = ( scrapedData = {} ) => {
+    const url = 'https://api.pushover.net/1/messages.json'
+    const formData = new FormData();
+    formData.append('token', Token);
+    formData.append('user', Userkey);
+    formData.append('message', scrapedData.tradeInfo);
+
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+    })
+        .catch(error => console.error('PUSHOVER ERROR:', error));
+}
+
 // Discord notification
-var sendWebHookDiscord = (urlDiscordWebhook = webhook, webhookType, scrapedData = {} ,embeds = []) => {
+var sendWebHookDiscord = (urlDiscordWebhook = Webhook, webhookType, scrapedData = {} ,embeds = []) => {
     const url = urlDiscordWebhook
     const templateWebhook = {
         "areYouReady": {

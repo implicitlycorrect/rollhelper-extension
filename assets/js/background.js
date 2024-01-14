@@ -23,11 +23,16 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     // Send the trade offer
     if (msg.type === "sendSteamOffer") {
         let offerMsg = msg.offerMsg
-        if (offerMsg == undefined) offerMsg = ''
-        let encodedMsg = encodeURIComponent(offerMsg)
         const steamTradeUrl = msg.tradeLink
         const assetID = msg.assetID
-        const tradelinkOffer = `${steamTradeUrl}&csgotrader_send=your_id_730_2_${assetID}&csgotrader_message=${encodedMsg}`;
+        let tradelinkOffer = ''
+
+        if ((offerMsg !== undefined) || (offerMsg !== ' ')) {
+            let encodedMsg = encodeURIComponent(offerMsg)
+            tradelinkOffer = `${steamTradeUrl}&csgotrader_send=your_id_730_2_${assetID}&csgotrader_message=${encodedMsg}`;
+        }else {
+            tradelinkOffer = `${steamTradeUrl}&csgotrader_send=your_id_730_2_${assetID}`;
+        }
 
         chrome.tabs.create({ url: tradelinkOffer });
         return true;

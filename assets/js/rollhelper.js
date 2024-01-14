@@ -1,15 +1,21 @@
-// DEV MESSAGE:
-console.log(`%c[ROLLHELPER - EXTENSION]`, "color:#e0e0e0;font-weight: bold; font-size:23px")
-// console.log(`%cIf you enocunter any issues / bugs or just have suggestions for the addon, you can email me at: rollhelperdeveloper@gmail.com`,
-//     "color:#e0e0e0;font-weight: normal; font-size:15px")
-const kniveTypes = ["knife","karambit","bayonet","daggers"]
+console.log(`%c[ROLLHELPER] [v1.0.1]`, "color:#e0e0e0;font-weight: bold; font-size:23px")
+
 let itemID
 let userID
 let balance
 let socket
+
 let itemsList = []
 let allItemList = []
+
+itemInfo = {};
+prices = {};
 rates = {}
+
+setTimeout(()=>{
+    updateSettings()
+},6000)
+
 
 chrome.runtime.sendMessage({type: 'getActiveRollUrls'}, async response => {
     let csgorollUrlCount = response
@@ -19,143 +25,20 @@ chrome.runtime.sendMessage({type: 'getActiveRollUrls'}, async response => {
         await updateSettings()
         connectWSS()
     }else{
-        console.log(`%cRollHelper websocket connection runs in different tab!`,"color:#e0e0e0;font-weight: normal; font-size:15px")
+        console.log(`%cRollHelper connection runs in different tab!`,"color:#e0e0e0;font-weight: normal; font-size:15px")
     }
 });
 
-let coinsCounter = 0
-invFailFetchCount = 0
-let afterID = ''
-const getCurrentSteamInvData  =  () => {
-    const url = "https://api.csgoroll.com/graphql"
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "operationName": "steamInventoryItems",
-            "variables": {
-                "steamAppName":"CSGO",
-                "first":250,
-                "userId":userID,
-                "after": `${afterID}`
-            },
-            "extensions":{
-                "persistedQuery":{
-                    "version":1,
-                    "sha256Hash":"7ac9a690c0ac108b6742c9a4726af9df78e53b75152608d0b3acaf184977c306"
-                }
-            }
-        }),
-        credentials: 'include'
-    })
-        .then(res => res.json())
-        .then(res => {
-           //  console.log(res)
-            let tradeListData = res.data.steamInventoryItems.edges
-            let hasNextPage = res.data.steamInventoryItems.pageInfo.hasNextPage // bool
-            for (const itemData of tradeListData) {
-
-                let itemValue = itemData.node.itemVariant.value
-                coinsCounter += itemValue
-
-                if (itemData.node.tradable === true) {
-                    let item = {}
-                    let stickers = []
-                    if (itemData.node.steamStickersDescriptions.length > 0) {
-                        for (const sticker of itemData.node.steamStickersDescriptions) {
-                            let name = sticker.name
-                            stickers.push(name)
-                        }
-                    }
-                    item.steamExternalId = itemData.node.steamExternalAssetId
-                    item.marketName = itemData.node.itemVariant.externalId
-                    item.assetID = itemData.node.steamItemIdentifiers.assetId
-                    item.itemID = itemData.node.itemVariant.itemId
-                    item.stickers = stickers
-                    if (itemData.node.steamInspectItem?.paintWear) {
-                        item.float = Math.floor(itemData.node.steamInspectItem.paintWear * 1000) / 1000;
-                    }
-                    itemsList.push(item)
-                }
-            }
-            if (hasNextPage) {
-                afterID = res.data.steamInventoryItems.pageInfo.endCursor
-                getCurrentSteamInvData()
-            }else{
-                console.log(`%c[ROLLHELPER] -> Successfully loaded tradable items from steam: (${itemsList.length})`,depositCSSlog)
-                try{
-                    document.getElementsByClassName('counterCoinButton')[0].innerHTML = Math.round(coinsCounter)
-                }catch(err){
-                    //
-                }
-            }
-            //console.log(itemsList)
-        })
-        .catch(error => {
-            console.log(error)
-            console.log(`%c[ROLLHELPER - ERROR] -> Failed to load the steam inventory data - trying again in 3 seconds`,errorCSSlog)
-            invFailFetchCount += 1
-            setTimeout(()=>{
-                if (invFailFetchCount <= 3) {
-                    getCurrentSteamInvData()
-                }else {
-                    console.log(`%c[ROLLHELPER - ERROR] -> Max amount of tries reached - refresh the page to load inventory`,errorCSSlog)
-                }
-            },3000)
-        })
-}
-
-const ratesURL = chrome.runtime.getURL('assets/js/rates.json');
+const ratesURL = chrome.runtime.getURL('assets/rates/rates.json');
 fetch(ratesURL)
     .then(response => response.json())
     .then(data => {
         rates = data;
     })
     .catch(error => {
-        console.log(`%c[ROLLHELPER - ERROR] - Could not load the pricing rates file (rates.json)`,errorCSSlog);
+        console.log(error)
+        console.log(`%c[ROLLHELPER - ERROR] - Could not load the pricing rates file (rates.json)`, errorCSSlog);
     });
-
-let getUserIDcounter = 0
-async function  getUserID() {
-    getUserIDcounter += 1
-    const url = "https://api.csgoroll.com/graphql"
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ "operationName": "CurrentUser",
-            "variables": {},
-            "query": "query CurrentUser {\n  currentUser {\n    ...User\n    __typename\n  }\n}\n\nfragment User on User {\n  id\n  name\n  email\n  verified\n  currency\n  createdAt\n  acceptTos\n  avatar\n  steamId\n  mutedUntil\n  roles\n  userProgress {\n    id\n    xp\n    requiredXp\n    nextRequiredXp\n    level\n    __typename\n  }\n  unlockedChat\n  lastDepositAt\n  stickyReferee\n  steamApiKey\n  steamTradeUrl\n  verificationStatus\n  totalDeposit\n  dailyWithdrawLimit\n  preferences {\n    ...UserPreferences\n    __typename\n  }\n  referralPromoCode {\n    id\n    code\n    __typename\n  }\n  team {\n    id\n    name\n    __typename\n  }\n  tickets {\n    total\n    __typename\n  }\n  wallets {\n    ...Wallet\n    __typename\n  }\n  market {\n    id\n    slug\n    name\n    __typename\n  }\n  trader\n  suspectedTrader\n  microphoneEnabled\n  __typename\n}\n\nfragment UserPreferences on UserPreferences {\n  id\n  name\n  lastName\n  address1\n  address2\n  postcode\n  region\n  city\n  country {\n    code\n    name\n    __typename\n  }\n  birthDate\n  gender\n  phone\n  __typename\n}\n\nfragment Wallet on Wallet {\n  id\n  name\n  amount\n  currency\n  __typename\n}\n" }),
-        credentials: 'include'
-    })
-        .then(res => res.json())
-        .then(res => {
-            //data currentUser wallet0 amount
-            userID = res.data.currentUser.id;
-            balance = res.data.currentUser.wallets[0].amount
-
-            if (getUserIDcounter === 1) {
-                coinsCounter += balance
-                document.getElementsByClassName('counterCoinButton')[0].innerHTML = Math.round(coinsCounter)
-            }
-            // console.log(userID)
-        })
-}
-itemInfo = {};
-prices = {};
-
-setTimeout(()=>{
-    updateSettings()
-},6000)
-
-let DateFormater = (date) => "[" + new Date().toLocaleString("en-US",
-    { hour12: false, hour: "numeric", minute: "numeric"}) + "]";
-
 
 chrome.storage.sync.get(["peApi"]).then((res) => {
     peApiKey = res.peApi;
@@ -163,46 +46,28 @@ chrome.storage.sync.get(["peApi"]).then((res) => {
         loadPriceDataPricempire()
     } else {
         loadPriceDataPricempire()
-        //loadPriceDataCSGOTRADER()
     }
 });
 
 
-// Pushover notification
-var sendPushoverNotification = ( scrapedData = {} ) => {
-    const url = 'https://api.pushover.net/1/messages.json'
-    const formData = new FormData();
-    formData.append('token', token);
-    formData.append('user', userkey);
-    formData.append('message', scrapedData.tradeInfo);
-
-    fetch(url, {
-        method: 'POST',
-        body: formData,
-    })
-        .catch(error => console.error('PUSHOVER ERROR:', error));
-}
-
-
 function connectWSS(){
-    socket = new WebSocket("wss://api.csgoroll.com/graphql", "graphql-transport-ws");
-    socket.onopen = () => {
+    socket = new WebSocket(
+        "wss://api.csgoroll.com/graphql",
+        "graphql-transport-ws"
+    );
 
+    socket.onopen = () => {
         setTimeout(() => {
             socket.send(JSON.stringify({"type":"connection_init"}));
         },300);
 
         setTimeout(() => {
             socket.send(JSON.stringify(updateTradePayload));
-        },2000);
+        },1300);
 
-        ping = setInterval( () => {
-            try {
-                sendPing
-            }catch(err){
-            }
+        setInterval( () => {
+            socket.send(JSON.stringify({"type":"ping"}))
         },57000);
-        ping;
     }
 
     socket.onmessage = (event) => {
@@ -268,10 +133,12 @@ function connectWSS(){
                             sendPushoverNotification(itemInfo);
                         }
                         if (discord) {
-                            sendWebHookDiscord(webhook, webhookType = 'areYouReady', itemInfo);
+                            sendWebHookDiscord(Webhook, webhookType = 'areYouReady', itemInfo);
                         }
                     }
                 }
+
+
                 if (trade.depositor.id != userID){
                     let marketName = trade.tradeItems[0].marketName;
                     let markup = trade.tradeItems[0].markupPercent;
@@ -359,7 +226,7 @@ function connectWSS(){
 
                 if (depoAlert && completedAlert) {
                     if (Pushover) sendPushoverNotification(itemInfo);
-                    if (discord) sendWebHookDiscord(webhook, webhookType = 'TradeCompleted', itemInfo);
+                    if (discord) sendWebHookDiscord(Webhook, webhookType = 'TradeCompleted', itemInfo);
                 }
             }
 
@@ -374,7 +241,7 @@ function connectWSS(){
 
                 if (depoAlert && cooldownAlert) {
                     if (Pushover) sendPushoverNotification(itemInfo);
-                    if (discord) sendWebHookDiscord(webhook, webhookType = 'TradeCooldown', itemInfo);
+                    if (discord) sendWebHookDiscord(Webhook, webhookType = 'TradeCooldown', itemInfo);
                 }
             }
 
@@ -469,7 +336,7 @@ function connectWSS(){
 
                     if (withdrawAlert == true) {
                         if (Pushover) sendPushoverNotification(itemInfo);
-                        if (discord) sendWebHookDiscord(webhook, webhookType = 'IncommingTrade', itemInfo);
+                        if (discord) sendWebHookDiscord(Webhook, webhookType = 'IncommingTrade', itemInfo);
                     }
                 }
             }
@@ -489,17 +356,6 @@ function connectWSS(){
             connectWSS()
         },1200)
     };
-}
-
-function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-
-function sendPing(){
-    socket.send(JSON.stringify({"type":"ping"}))
 }
 
 // PRICEMPIRE PRICE PROVIDER
@@ -535,7 +391,7 @@ async function loadPriceDataCSGOTRADER(){
 const buffProfitEval = (marketName, rollprice, event='other') => {
     let rate;
     if (event === 'deposit') {
-       rate = 0.66; // always use 0.66 rate for deposit logs
+        rate = 0.66; // always use 0.66 rate for deposit logs
     }
     else {
         // Withdraw logs using rate.json file
@@ -568,7 +424,7 @@ const buffProfitEval = (marketName, rollprice, event='other') => {
                     return [buff_usd, profit, rate]
 
                 }catch(err){
-                    console.log(`%cPRICECHECK ERROR: ${marketName}`,errorCSSlog)
+                    console.log(`%cPRICECHECK ERROR: ${marketName}`, errorCSSlog)
                 }
             }
             return null;
@@ -586,7 +442,7 @@ const buffProfitEval = (marketName, rollprice, event='other') => {
                     let profit = (100 + (parseFloat(((coins_usd - buff_usd)/buff_usd * 100)))).toFixed(2);
                     return [buff_usd, profit, rate];
                 }catch(err){
-                    console.log(`%PRICECHECK ERROR: ${marketName}`,errorCSSlog)
+                    console.log(`%PRICECHECK ERROR: ${marketName}`, errorCSSlog)
                 }
             }else{
                 price_obj = prices[marketName]
@@ -598,86 +454,10 @@ const buffProfitEval = (marketName, rollprice, event='other') => {
                         return [buff_usd, profit, rate]
 
                     }catch(err){
-                        console.log(`%PRICECHECK ERROR: ${marketName}`,errorCSSlog)
+                        console.log(`%cPRICECHECK ERROR: ${marketName}`, errorCSSlog)
                     }
                 }
             }
             return null;
     }
-}
-
-const isDoppler = (marketName) => {
-    return (marketName.includes('Doppler') || marketName.includes('Emerald') ||
-        marketName.includes('Ruby') || marketName.includes('Black Pearl') ||
-        marketName.includes('Sapphire')) && isKnife(marketName) ? true : false;
-}
-
-const isKnife = (marketName) => {
-    marketName = marketName.toLowerCase()
-    if (kniveTypes.some((knifeType) => marketName.includes(knifeType))){
-       return true;
-    }
-    return false;
-}
-
-const refactorDopplerNameForPE = (marketName) => {
-     const phaseMatch = /Phase (\d+)/
-     const gemMatch = /(Ruby|Sapphire|Black Pearl|Emerald)/
-    if (marketName.match(phaseMatch)) {
-        let match = marketName.match(phaseMatch)[0]
-        let refactored = marketName.replace(match+' ','') + ` - ${match}`;
-        return refactored;
-    }
-    else{
-        if (marketName.match(gemMatch)) {
-            let match = marketName.match(gemMatch)[0]
-            if (match === 'Emerald') {
-                let refactored = marketName.replace(match, 'Gamma Doppler') + ` - ${match}`;
-                return refactored;
-            }else{
-                let refactored = marketName.replace(match, 'Doppler') + ` - ${match}`;
-                return refactored;
-            }
-        }
-    }
-}
-
-const refactorDopplerNameForCSGOTR = (marketName) => {
-    const phaseMatch = /Phase (\d+)/;
-    const gemMatch = /(Ruby|Sapphire|Black Pearl|Emerald)/;
-
-    if (marketName.match(phaseMatch)) {
-        let phase = marketName.match(phaseMatch)[0];
-        let refactoredName = marketName.replace(phase+' ', '')
-        return [refactoredName, phase]
-    }else{
-        if (marketName.match(gemMatch)) {
-            let match = marketName.match(gemMatch)[0]
-            if (match === 'Emerald') {
-                let refactored = marketName.replace(match, 'Gamma Doppler');
-                return [refactored, match];
-            }else{
-                let refactored = marketName.replace(match, 'Doppler');
-                return [refactored, match];
-            }
-        }
-    }
-}
-
-const evalMaxMarkup = (itemBasePrice, addedStickerValue) => {
-  //  let addedStickerValue = (stickersValue / 5) //20
-    let maxItemValue = (itemBasePrice + addedStickerValue)
-    let maxMarkupPercent = (maxItemValue - itemBasePrice)/itemBasePrice * 100
-    if (maxMarkupPercent <= 12) return  12;
-    return (maxMarkupPercent+12).toFixed(2);
-}
-
-const sendSteamTradeOffer = (assetID, tradeLink, offerMessage) => {
-    chrome.runtime.sendMessage({
-        type: 'sendSteamOffer',
-        assetID: assetID,
-        tradeLink: tradeLink,
-        offerMsg: offerMessage
-    }, response => {
-    });
 }

@@ -29,7 +29,7 @@ async function addForm() {
                 for (let node of mutation.addedNodes) {
 
                     if (node instanceof HTMLElement && node.localName == 'cw-csgo-market-item-card'
-                    && !node.firstChild.classList.contains('horizontal')) {
+                        && !node.firstChild.classList.contains('horizontal')) {
                         setBuffValue(node);
                     }
 
@@ -132,6 +132,7 @@ function setBuffValue(item) {
             let f = nameArr[0]
             let s = nameArr[1]
 
+
             // if doppler has a phase
             if (f == 'Doppler'){
                 itemInfo.skinName = 'Doppler'
@@ -143,8 +144,14 @@ function setBuffValue(item) {
             else if ((nameArr.length === 1) && (f == 'Ruby' || f == 'Sapphire')){
                 itemInfo.skinName = f
                 itemName += " | " + 'Doppler'
-                if (s == 'Pearl') phase = skin
-                else var phase = f
+            }
+
+            //FIX for Black Pearls
+            //if doppler is a Black Pearl
+            else if (f == 'Black' && s == 'Pearl'){
+                itemInfo.skinName = 'Black Pearl'
+                itemName += " | " + 'Doppler'
+                var phase = 'Black Pearl'
             }
 
             // if doppler is a gamma doppler
@@ -153,8 +160,9 @@ function setBuffValue(item) {
                 itemName += " | " + 'Gamma Doppler'
                 var phase = nameArr[2] + ' ' + nameArr[3]
             }
+
             // if gamma doppler is a gem -> emerald
-            else if ((nameArr.length === 1) && f == 'Emerald'){
+            else if ((nameArr.length === 1) && (f == 'Emerald') && isKnife(itemName)){
                 itemInfo.skinName = f
                 itemName += " | " + 'Gamma Doppler'
                 var phase = 'Emerald'
@@ -243,8 +251,6 @@ function setBuffValue(item) {
         }
     }
 
-    let buff_usd;
-    let coins_usd;
     switch (provider){
         case 'pricempire':
             if (phase !== undefined) itemName = itemName + ' - ' + phase;
