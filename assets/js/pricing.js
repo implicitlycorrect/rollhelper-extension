@@ -144,6 +144,7 @@ function setBuffValue(item) {
             else if ((nameArr.length === 1) && (f == 'Ruby' || f == 'Sapphire')){
                 itemInfo.skinName = f
                 itemName += " | " + 'Doppler'
+                var phase = f
             }
 
             //FIX for Black Pearls
