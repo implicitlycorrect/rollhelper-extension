@@ -1,3 +1,5 @@
+const ratesURL = chrome.runtime.getURL('assets/rates/rates.json');
+
 console.log(`%c[ROLLHELPER] [v1.0.1]`, "color:#e0e0e0;font-weight: bold; font-size:23px")
 
 let itemID
@@ -18,18 +20,19 @@ setTimeout(()=>{
 
 
 chrome.runtime.sendMessage({type: 'getActiveRollUrls'}, async response => {
-    let csgorollUrlCount = response
+    let csgorollUrlCount = response[1]
+    let currentUrl = response[0]
+    domainUrl = createApiUrl(currentUrl)
     if (csgorollUrlCount === 1) {
         await getUserID()
         getCurrentSteamInvData()
         await updateSettings()
         connectWSS()
     }else{
-        console.log(`%cRollHelper connection runs in different tab!`,"color:#e0e0e0;font-weight: normal; font-size:15px")
+        console.log(`%cRollHelper runs in different tab!`,"color:#e0e0e0;font-weight: normal; font-size:15px")
     }
 });
 
-const ratesURL = chrome.runtime.getURL('assets/rates/rates.json');
 fetch(ratesURL)
     .then(response => response.json())
     .then(data => {
@@ -358,25 +361,18 @@ function connectWSS(){
     };
 }
 
-// PRICEMPIRE PRICE PROVIDER
+// PRICEMPIRE PRICE DATA LOAD
 async function loadPriceDataPricempire(){
-    const priceProviderURL = `https://api.pricempire.com/v3/getAllItems?sources=buff&api_key=${peApiKey}`;
-    try{
-        let res = await fetch(priceProviderURL)
-        if (res.status === 200) {
-            let data = await res.json()
-            prices = data
-            provider = 'pricempire'
-            console.log(`%c[PRICEMPIRE] -> Successfully loaded current price data`, pricempireCSSlog)
-        }else{
-            console.log(`%c[PRICEMPIRE - ERROR] -> STATUS CODE: ${res.status}`,pricempireCSSlog)
-            console.log(`%c[ROLLHELPER] -> Enter Pricempire API KEY for pricing`, pricempireCSSlog)
-            //loadPriceDataCSGOTRADER() // load backup provider
+    chrome.runtime.sendMessage({type: 'pricempire', key: peApiKey}, async response => {
+        if (response.error) {
+            console.log(`%c[PRICEMPIRE - ERROR] -> ${response.error}`, pricempireCSSlog)
         }
-    }catch(err){
-        console.log(`%c[PRICEMPIRE - ERROR] -> Can't update the current price data`, pricempireCSSlog)
-        //loadPriceDataCSGOTRADER()
-    }
+        else{
+            provider = 'pricempire'
+            prices = response
+            console.log(`%c[PRICEMPIRE] -> Successfully loaded current price data`, pricempireCSSlog)
+        }
+    });
 }
 
 // FREE CSGOTRADER PRICE PROVIDER

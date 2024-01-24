@@ -6,8 +6,8 @@ let afterID = ''
 // and creates object with data about each item - this is used later
 // to determine correct item to send via steam trade offer (using assetid + float)
 const getCurrentSteamInvData  = () => {
-    const url = "https://api.csgoroll.com/graphql"
-    fetch(url, {
+
+    fetch(domainUrl, {
         method: 'POST',
         headers: {
             'Accept': 'application/json, text/plain, */*',
@@ -66,7 +66,7 @@ const getCurrentSteamInvData  = () => {
                 try{
                     document.getElementsByClassName('counterCoinButton')[0].innerHTML = Math.round(coinsCounter)
                 }catch(err){
-                    // ignore
+                    // ...
                 }
             }
         })

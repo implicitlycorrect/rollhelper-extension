@@ -4,8 +4,8 @@ let getUserIDcounter = 0
 // total inventory coins value (balance + inv)
 async function getUserID() {
     getUserIDcounter += 1
-    const url = "https://api.csgoroll.com/graphql"
-    fetch(url, {
+
+    fetch(domainUrl, {
         method: 'POST',
         headers: {
             'Accept': 'application/json, text/plain, */*',

@@ -2,22 +2,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.type === 'getActiveRollUrls') {
         chrome.tabs.query({},function(tabs) {
             csgorollActiveUrls = 0
+            let res = []
             for (const tab of tabs){
                 if (tab.url.includes('www.csgoroll')){
+                    currentDomain = tab.url
                     csgorollActiveUrls += 1
+                    res = [currentDomain, csgorollActiveUrls]
                 }
             }
-            sendResponse(csgorollActiveUrls)
+            sendResponse(res)
         });
         return true
-    }
-
-    if (msg.type === "priceProvider") {
-        const json_url = 'https://prices.csgotrader.app/latest/prices_v6.json';
-        fetch(json_url)
-            .then(response => response.json()
-                .then(t => sendResponse(t)))
-        return true;
     }
 
     // Send the trade offer
@@ -36,5 +31,27 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
         chrome.tabs.create({ url: tradelinkOffer });
         return true;
+    }
+
+    // Pricempire prices fetch
+    if (msg.type === "pricempire") {
+        const apiKey = msg.key;
+
+        try {
+            const priceProviderURL = `https://api.pricempire.com/v3/getAllItems?sources=buff&api_key=${apiKey}`;
+
+            fetch(priceProviderURL)
+                .then(res => res.json())
+                .then(data => {
+                    sendResponse(data);
+                })
+                .catch(error => {
+                    sendResponse({ error: "Failed to load pricempire prices" });
+                });
+            return true;
+        } catch (e) {
+            console.error("Unexpected error:", e);
+            sendResponse({ error: "Unexpected error" });
+        }
     }
 });
