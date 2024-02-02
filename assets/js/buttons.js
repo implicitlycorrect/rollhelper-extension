@@ -36,7 +36,7 @@ const createPeLogoDiv = () => {
     const div = document.createElement('div')
     const img = document.createElement('img')
     const a = document.createElement('a')
-    a.href = 'https://pricempire.com/r/rollhelper'
+    a.href = 'https://old.pricempire.com/r/rollhelper'
     a.target ='_blank'
     img.style.height = '35px'
     img.src = pelogo;
