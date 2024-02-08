@@ -24,7 +24,7 @@ const getCurrentSteamInvData  = () => {
             "extensions":{
                 "persistedQuery":{
                     "version":1,
-                    "sha256Hash":"7ac9a690c0ac108b6742c9a4726af9df78e53b75152608d0b3acaf184977c306"
+                    "sha256Hash":"507db98dba3ef6b48d8a9569760fb2424f1691a533cac8704e7bc708afaf39e2"
                 }
             }
         }),
