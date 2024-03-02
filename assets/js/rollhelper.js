@@ -217,7 +217,7 @@ function connectWSS(){
                     maxMarkup = evalMaxMarkup(basePrice,addedStickersValue)
                 }
 
-                let eval_res = buffProfitEval(marketName, value) /
+                let eval_res = buffProfitEval(marketName, value)
                 usd = eval_res ? eval_res[0] : "-";
                 profit = eval_res ? eval_res[1] : "-";
                 rate = eval_res ? eval_res[2] : "-";
