@@ -14,111 +14,216 @@ var sendPushoverNotification = ( scrapedData = {} ) => {
 }
 
 // Discord notification
-var sendWebHookDiscord = (urlDiscordWebhook = Webhook, webhookType, scrapedData = {} ,embeds = []) => {
+var sendWebHookDiscord = (urlDiscordWebhook = Webhook, webhookType, tradeInfo = {}) => {
     const url = urlDiscordWebhook
     const templateWebhook = {
         "areYouReady": {
-            "username": `DEPOSIT`,
-            "avatar_url": 'https://pbs.twimg.com/profile_images/1610084878720049154/n0j4nld9_400x400.png',
-            "content": ``,
+            "username": `ROLLHELPER`,
+            "avatar_url": 'https://images.g2a.com/360x600/1x1x1/csgoroll-gift-card-5-coins-key-global-i10000337548004/cbf80f13366c442d940a792f',
+            "content": "",
+            "tts": false,
             "embeds": [
                 {
-                    "title": `Ready to deliver!`,
-                    "description": `Send the item!
-                    @`,
-                    "color": 0,
+                    "type": "rich",
+                    "title": `CSGOROLL DEPOSIT`,
+                    "description": `Your skin has just been sold!`,
+                    "color": 0x00FFFF,
                     "fields": [
                         {
-                            "name": "ITEM: ",
-                            "value": scrapedData.tradeInfo
+                            "name": `SKIN`,
+                            "value": `${tradeInfo.marketname} ${tradeInfo.float}`,
+                            "inline": true
+                        },
+                        {
+                            "name": `PRICE`,
+                            "value": `${tradeInfo.value} coins`,
+                            "inline": true
+                        },
+                        {
+                            "name": `MARKUP`,
+                            "value": `${tradeInfo.markup}% [${tradeInfo.maxMarkup}%]`,
+                            "inline": true
+                        },
+                        {
+                            "name": `%BUFF163`,
+                            "value": `${tradeInfo.buff_percent}%`,
+                            "inline": true
+                        },
+                        {
+                            "name": `BUFF163`,
+                            "value": `${tradeInfo.buff163}$`,
+                            "inline": true
+                        },
+                        {
+                            "name": `ROLL-USD`,
+                            "value": `${tradeInfo.coins_usd}$`,
+                            "inline": true
                         }
-                    ]
+                    ],
+                    "author": {
+                        "name": `ROLLHELPER`,
+                        "url": `https://old.pricempire.com/r/rollhelper`
+                    },
+                    "footer": {
+                        "text": `DONT SEE PRICING / COMPARASION?\nGet your subscription on PE via link bellow! (dev / enterprise)\nhttps://www.old.pricempire.com/r/rollhelper`
+                    },
+                    "thumbnail": {
+                        "url": tradeInfo.iconUrl,
+                    },
                 }
             ]
         },
+
         "IncommingTrade": {
-            "username": `WITHDRAWBOT`,
-            "avatar_url": 'https://pbs.twimg.com/profile_images/1610084878720049154/n0j4nld9_400x400.png',
-            "content": ``,
+            "username": `ROLLHELPER`,
+            "avatar_url": 'https://images.g2a.com/360x600/1x1x1/csgoroll-gift-card-5-coins-key-global-i10000337548004/cbf80f13366c442d940a792f',
+            "content": "",
+            "tts": false,
             "embeds": [
                 {
-                    "title": `Item Withdrawn!`,
-                    "description": `Accept the item!
-                    @`,
-                    "color": 0,
+                    "type": "rich",
+                    "title": `CSGOROLL WITHDRAW`,
+                    "description": `You just bought skin!`,
+                    "color": 0x1eff00,
                     "fields": [
                         {
-                            "name": "ITEM: ",
-                            "value": scrapedData.tradeInfo
+                            "name": `SKIN`,
+                            "value": `${tradeInfo.marketname} ${tradeInfo.float}`,
+                            "inline": true
+                        },
+                        {
+                            "name": `PRICE`,
+                            "value": `${tradeInfo.value} coins`,
+                            "inline": true
+                        },
+                        {
+                            "name": `MARKUP`,
+                            "value": `${tradeInfo.markup}% [${tradeInfo.maxMarkup}%]`,
+                            "inline": true
+                        },
+                        {
+                            "name": `%BUFF163`,
+                            "value": `${tradeInfo.buff_percent}%`,
+                            "inline": true
+                        },
+                        {
+                            "name": `BUFF163`,
+                            "value": `${tradeInfo.buff163}$`,
+                            "inline": true
+                        },
+                        {
+                            "name": `ROLL-USD`,
+                            "value": `${tradeInfo.coins_usd}$`,
+                            "inline": true
                         }
                     ],
-                    "image": {
-                        "url": ''
-                    }
+                    "author": {
+                        "name": `ROLLHELPER`,
+                        "url": `https://old.pricempire.com/r/rollhelper`
+                    },
+                    "footer": {
+                        "text": `DONT SEE PRICING / COMPARASION?\nGet your subscription on PE via link bellow! (dev / enterprise)\nhttps://www.old.pricempire.com/r/rollhelper`
+                    },
+                    "thumbnail": {
+                        "url": tradeInfo.iconUrl,
+                    },
                 }
             ]
         },
         "TradeCompleted": {
-            "username": `TRADEBOT`,
-            "avatar_url": 'https://pbs.twimg.com/profile_images/1610084878720049154/n0j4nld9_400x400.png',
-            "content": ``,
+            "username": `ROLLHELPER`,
+            "avatar_url": 'https://images.g2a.com/360x600/1x1x1/csgoroll-gift-card-5-coins-key-global-i10000337548004/cbf80f13366c442d940a792f',
+            "content": "",
+            "tts": false,
             "embeds": [
                 {
-                    "title": `TRADE COMPLETED`,
-                    "description": `@`,
-                    "color": 0,
+                    "type": "rich",
+                    "title": `CSGOROLL COMPLETED`,
+                    "description": `The trade has been completed!`,
+                    "color": 0xfff8f8,
                     "fields": [
                         {
-                            "name": "ITEM: ",
-                            "value": scrapedData.tradeInfo
+                            "name": `SKIN`,
+                            "value": `${tradeInfo.marketname} ${tradeInfo.float}`,
+                            "inline": true
+                        },
+                        {
+                            "name": `PRICE`,
+                            "value": `${tradeInfo.value} coins`,
+                            "inline": true
+                        },
+                        {
+                            "name": `MARKUP`,
+                            "value": `${tradeInfo.markup}% [${tradeInfo.maxMarkup}%]`,
+                            "inline": true
+                        },
+                        {
+                            "name": `%BUFF163`,
+                            "value": `${tradeInfo.buff_percent}%`,
+                            "inline": true
+                        },
+                        {
+                            "name": `BUFF163`,
+                            "value": `${tradeInfo.buff163}$`,
+                            "inline": true
+                        },
+                        {
+                            "name": `ROLL-USD`,
+                            "value": `${tradeInfo.coins_usd}$`,
+                            "inline": true
                         }
                     ],
-                    "image": {
-                        "url": ''
-                    }
+                    "author": {
+                        "name": `ROLLHELPER`,
+                        "url": `https://old.pricempire.com/r/rollhelper`
+                    },
+                    "footer": {
+                        "text": `DONT SEE PRICING / COMPARASION?\nGet your subscription on PE via link bellow! (dev / enterprise)\nhttps://www.old.pricempire.com/r/rollhelper`
+                    },
+                    "thumbnail": {
+                        "url": tradeInfo.iconUrl,
+                    },
                 }
             ]
         },
         "TradeCooldown": {
-            "username": `TRADEBOT`,
-            "avatar_url": 'https://pbs.twimg.com/profile_images/1610084878720049154/n0j4nld9_400x400.png',
-            "content": ``,
+            "username": `ROLLHELPER`,
+            "avatar_url": 'https://images.g2a.com/360x600/1x1x1/csgoroll-gift-card-5-coins-key-global-i10000337548004/cbf80f13366c442d940a792f',
+            "content": "",
+            "tts": false,
             "embeds": [
                 {
-                    "title": `TRADE COOLDOWN`,
-                    "description": `Cancell the steam offer!
-                    @`,
-                    "color": 0,
+                    "type": "rich",
+                    "title": `CSGOROLL COOLDOWN`,
+                    "description": `Your trade has expired, cancel the steam offer!`,
+                    "color": 0xf30909,
                     "fields": [
                         {
-                            "name": "ITEM: ",
-                            "value": scrapedData.tradeInfo
-                        }
-                    ],
-                    "image": {
-                        "url": ''
-                    }
-                }
-            ]
-        },
-        "user_cancelled": {
-            "username": `TRADEBOT`,
-            "avatar_url": 'https://pbs.twimg.com/profile_images/1610084878720049154/n0j4nld9_400x400.png',
-            "content": ``,
-            "embeds": [
-                {
-                    "title": `WITHDRAW CANCELLED`,
-                    "description": `@`,
-                    "color": 0,
-                    "fields": [
+                            "name": `SKIN`,
+                            "value": `${tradeInfo.marketname} ${tradeInfo.float}`,
+                            "inline": true
+                        },
                         {
-                            "name": "ITEM: ",
-                            "value": scrapedData.tradeInfo
+                            "name": `PRICE`,
+                            "value": `${tradeInfo.value} coins`,
+                            "inline": true
+                        },
+                        {
+                            "name": `MARKUP`,
+                            "value": `${tradeInfo.markup}%`,
+                            "inline": true
                         }
                     ],
-                    "image": {
-                        "url": ''
-                    }
+                    "author": {
+                        "name": `ROLLHELPER`,
+                        "url": `https://old.pricempire.com/r/rollhelper`
+                    },
+                    "footer": {
+                        "text": `DONT SEE PRICING / COMPARASION?\nGet your subscription on PE via link bellow! (dev / enterprise)\nhttps://www.old.pricempire.com/r/rollhelper`
+                    },
+                    "thumbnail": {
+                        "url": tradeInfo.iconUrl,
+                    },
                 }
             ]
         }

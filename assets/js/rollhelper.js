@@ -1,6 +1,6 @@
 const ratesURL = chrome.runtime.getURL('assets/rates/rates.json');
 
-console.log(`%c[ROLLHELPER] [v1.0.1]`, "color:#e0e0e0;font-weight: bold; font-size:23px")
+console.log(`%c[ROLLHELPER] [v1.0.2]`, "color:#e0e0e0;font-weight: bold; font-size:23px")
 
 let itemID
 let userID
@@ -82,18 +82,20 @@ function connectWSS(){
         if(data?.payload?.data?.updateTrade){
             let trade = data.payload.data.updateTrade.trade
             if(trade.withdrawer != null && trade.status === 'JOINED'){
-                // DEPOSIT
+                // DEPOSIT EVENT
                 if (trade.depositor.id === userID && depoAutoAccept) {
                     let marketName = trade.tradeItems[0].marketName;
                     let markup = trade.tradeItems[0].markupPercent;
                     let value = trade.tradeItems[0].value;
                     let withdrawerName = trade.withdrawer.displayName;
                     let withdrawerID = trade.withdrawer.id;
-                    let float = trade.avgPaintWear; // 3 decimal cut
-                    let ID = trade.tradeItems[0].itemVariant.id // longer id
-                    let itemID = trade.tradeItems[0].itemVariant.itemId // shorter id
+                    let float = trade.avgPaintWear;
+                    let ID = trade.tradeItems[0].itemVariant.id
+                    let itemID = trade.tradeItems[0].itemVariant.itemId
                     let stickersArr = trade.tradeItems[0].stickers
                     let basePrice = trade.tradeItems[0].itemVariant.value
+                    let icon_url = trade.tradeItems[0].itemVariant.iconUrl
+
                     let addedStickersValue = 0
                     let maxMarkup = 12
                     let coinsToUsd
@@ -113,19 +115,27 @@ function connectWSS(){
                     let usd;
                     let profit;
                     let rate;
-                    let eval_res = buffProfitEval(marketName, value, 'deposit') // [usd, profit]
+                    let eval_res = buffProfitEval(marketName, value, 'deposit')
 
-                    if (eval_res) {
-                        usd = eval_res[0];
-                        profit = eval_res[1];
-                        rate = eval_res[2];
-                        coinsToUsd = (value*rate).toFixed(2);
-                    }else {
-                        usd = '[-]';
-                        profit = '[-]';
-                        coinsToUsd = '[-]'
-                        rate = '[-]'
+                    usd = eval_res ? eval_res[0] : "-";
+                    profit = eval_res ? eval_res[1] : "-";
+                    rate = eval_res ? eval_res[2] : "-";
+                    coinsToUsd = eval_res ? (value*rate).toFixed(2) : "-";
+
+                    let trade_info = {
+                        marketname: marketName,
+                        float: float,
+                        value: value,
+                        markup: markup,
+                        maxMarkup: maxMarkup,
+                        coins_usd: coinsToUsd,
+                        buff163:usd,
+                        buff_percent: profit,
+                        withdrawer_name: withdrawerName,
+                        withdrawer_id: withdrawerID,
+                        iconUrl:icon_url
                     }
+
                     const encodedItemName = encodeURIComponent(marketName).replace(/\(/g, '%28').replace(/\)/g, '%29');
                     const buffUrl = "https://api.pricempire.com/v1/redirectBuff/" + encodedItemName;
                     console.log(`%c${DateFormater(new Date())} | [DEPOSIT]\n\t${marketName}\n\t${value} coins | (${markup}%) | ${coinsToUsd}$\n\t[FV]: ${float} | [MAX MARKUP]: ${maxMarkup}%\n\t[BUFF163]: ${usd}$ (RATE: ${rate})\n\t[Price-Of-BUFF]: ${profit}%`,depositCSSlog)
@@ -136,7 +146,7 @@ function connectWSS(){
                             sendPushoverNotification(itemInfo);
                         }
                         if (discord) {
-                            sendWebHookDiscord(Webhook, webhookType = 'areYouReady', itemInfo);
+                            sendWebHookDiscord(Webhook, webhookType = 'areYouReady', trade_info);
                         }
                     }
                 }
@@ -169,28 +179,24 @@ function connectWSS(){
                          maxMarkup = evalMaxMarkup(basePrice,addedStickersValue)
                     }
 
-                    let eval_res = buffProfitEval(marketName, value) // [usd, profit, rate]
-                    if (eval_res) {
-                        usd = eval_res[0];
-                        profit = eval_res[1];
-                        rate = eval_res[2]
-                        coinsToUsd = (value*rate).toFixed(2);
-                    }else {
-                        usd = '[-]';
-                        profit = '[-]';
-                        coinsToUsd = '[-]'
-                        rate = '[-]'
-                    }
+                    let eval_res = buffProfitEval(marketName, value)
+                    usd = eval_res ? eval_res[0] : "-";
+                    profit = eval_res ? eval_res[1] : "-";
+                    rate = eval_res ? eval_res[2] : "-";
+                    coinsToUsd = eval_res ? (value*rate).toFixed(2) : "-";
+
                     console.log(`%c${DateFormater(new Date())} | [WITHDRAW - WAITING]\n\t${marketName}\n\t${value} coins | (${markup}%) | ${coinsToUsd}$\n\t[FV]: ${float} | [MAX MARKUP]: ${maxMarkup}%\n\tROLLNAME: ${rollName}\n\tRollID: ${rollID}\n\t[BUFF163]: ${usd}$ (RATE: ${rate})\n\t[Price-Of-BUFF]: ${profit}%`,noticeCSSlog)
                 }
             }
 
-
+            // COMPLETED EVENT
             if (trade.withdrawer != null && trade.status === 'COMPLETED'){
                 let marketName = trade.tradeItems[0].marketName;
                 let markup = trade.tradeItems[0].markupPercent;
                 let value = trade.tradeItems[0].value;
                 let float = trade.avgPaintWear;
+                let icon_url = trade.tradeItems[0].itemVariant.iconUrl
+
                 let usd;
                 let profit;
                 let rate;
@@ -211,17 +217,22 @@ function connectWSS(){
                     maxMarkup = evalMaxMarkup(basePrice,addedStickersValue)
                 }
 
-                let eval_res = buffProfitEval(marketName, value) // [usd, profit]
-                if (eval_res) {
-                     usd = eval_res[0];
-                     profit = eval_res[1];
-                     rate = eval_res[2];
-                     coinsToUsd = (value*rate).toFixed(2);
-                }else {
-                    usd = '[-]';
-                    profit = '[-]';
-                    coinsToUsd = '[-]'
-                    rate = '[-]'
+                let eval_res = buffProfitEval(marketName, value) /
+                usd = eval_res ? eval_res[0] : "-";
+                profit = eval_res ? eval_res[1] : "-";
+                rate = eval_res ? eval_res[2] : "-";
+                coinsToUsd = eval_res ? (value*rate).toFixed(2) : "-";
+
+                let trade_info = {
+                    marketname: marketName,
+                    float: float,
+                    value: value,
+                    markup: markup,
+                    maxMarkup: maxMarkup,
+                    coins_usd: coinsToUsd,
+                    buff163:usd,
+                    buff_percent: profit,
+                    iconUrl:icon_url
                 }
 
                 console.log(`%c${DateFormater(new Date())} | [TRADE - COMPLETED]\n\t${marketName}\n\t${value} coins | (${markup}%) | ${coinsToUsd}$\n\t[FV]: ${float} | [MAX MARKUP]: ${maxMarkup}%\n\t[BUFF163]: ${usd}$ (RATE: ${rate})\n\t[Price-Of-BUFF]: ${profit}%`,tradeCompletedCSSlog)
@@ -229,34 +240,44 @@ function connectWSS(){
 
                 if (depoAlert && completedAlert) {
                     if (Pushover) sendPushoverNotification(itemInfo);
-                    if (discord) sendWebHookDiscord(Webhook, webhookType = 'TradeCompleted', itemInfo);
+                    if (discord) sendWebHookDiscord(Webhook, webhookType = 'TradeCompleted', trade_info);
                 }
             }
-
+            // COOLDOWN EVENT
             if (trade.withdrawer != null && trade.status === 'COOLDOWN'){
                 let marketName = trade.tradeItems[0].marketName;
                 let markup = trade.tradeItems[0].markupPercent;
                 let value = trade.tradeItems[0].value;
                 let float = trade.avgPaintWear;
+                let icon_url = trade.tradeItems[0].itemVariant.iconUrl
+
+                let trade_info = {
+                    marketname: marketName,
+                    float: float,
+                    value: value,
+                    markup: markup,
+                    iconUrl:icon_url
+                }
 
                 console.log(`%c${DateFormater(new Date())} | [TRADE - COOLDOWN]\n\t${marketName}\n\t${value} coins | (${markup}%)\n\t[FV]: ${float}`,errorCSSlog)
                 itemInfo.tradeInfo = `[TRADE - COOLDOWN]\n${marketName}\n${value} coins | +${markup}%\n[FV: ${float}]`
 
                 if (depoAlert && cooldownAlert) {
                     if (Pushover) sendPushoverNotification(itemInfo);
-                    if (discord) sendWebHookDiscord(Webhook, webhookType = 'TradeCooldown', itemInfo);
+                    if (discord) sendWebHookDiscord(Webhook, webhookType = 'TradeCooldown', trade_info);
                 }
             }
 
+            // STEAM OFFER SENDING EVENT
             if(trade.withdrawer != null && trade.status === 'PROCESSING'){
                 if (trade.depositor.id == userID && sendSteamOffers) {
                     //send the steam offer here
                     let markup = trade.tradeItems[0].markupPercent;
                     let value = trade.tradeItems[0].value;
                     let marketName = trade.tradeItems[0].marketName;
-                    let float = trade.avgPaintWear; // 3 decimal cut
-                    let ID = trade.tradeItems[0].itemVariant.id // longer id
-                    let itemID = trade.tradeItems[0].itemVariant.itemId // shorter id
+                    let float = trade.avgPaintWear;
+                    let ID = trade.tradeItems[0].itemVariant.id
+                    let itemID = trade.tradeItems[0].itemVariant.itemId
                     let tradeLink = data.payload.data.updateTrade.trade.withdrawerSteamTradeUrl;
                     let asset
                     let found = false
@@ -288,11 +309,13 @@ function connectWSS(){
                     }
                 }
 
+                // WITHDRAW-ACCEPTED EVENT
                 if (trade.depositor.id != userID){
                     let marketName = trade.tradeItems[0].marketName;
                     let markup = trade.tradeItems[0].markupPercent;
                     let value = trade.tradeItems[0].value;
                     let float = trade.avgPaintWear;
+                    let icon_url = trade.tradeItems[0].itemVariant.iconUrl
                     let usd;
                     let profit;
                     let rate;
@@ -319,18 +342,24 @@ function connectWSS(){
                         maxMarkup = evalMaxMarkup(basePrice,addedStickersValue)
                     }
 
-                    let eval_res = buffProfitEval(marketName, value) // [usd, profit]
-                    if (eval_res) {
-                        usd = eval_res[0];
-                        profit = eval_res[1];
-                        rate = eval_res[2];
-                        coinsToUsd = (value*rate).toFixed(2);
-                    }else {
-                        usd = '[-]';
-                        profit = '[-]';
-                        coinsToUsd = '[-]'
-                        rate = '[-]'
+                    let eval_res = buffProfitEval(marketName, value)
+                    usd = eval_res ? eval_res[0] : "-";
+                    profit = eval_res ? eval_res[1] : "-";
+                    rate = eval_res ? eval_res[2] : "-";
+                    coinsToUsd = eval_res ? (value*rate).toFixed(2) : "-";
+
+                    let trade_info = {
+                        marketname: marketName,
+                        float: float,
+                        value: value,
+                        markup: markup,
+                        maxMarkup: maxMarkup,
+                        coins_usd: coinsToUsd,
+                        buff163:usd,
+                        buff_percent: profit,
+                        iconUrl:icon_url
                     }
+
                     const encodedItemName = encodeURIComponent(marketName).replace(/\(/g, '%28').replace(/\)/g, '%29');
                     const buffUrl = "https://api.pricempire.com/v1/redirectBuff/" + encodedItemName;
                     console.log(`%c${DateFormater(new Date())} | [WITHDRAW - ACCEPTED]\n\t${marketName}\n\t${value} coins | (${markup}%) | ${coinsToUsd}$\n\t[FV]: ${float} | [MAX MARKUP]: ${maxMarkup}%\n\t[BUFF163]: ${usd}$ (RATE: ${rate})\n\t[Price-Of-BUFF]: ${profit}%`, withdrawAcceptedCSSlog)
@@ -339,7 +368,7 @@ function connectWSS(){
 
                     if (withdrawAlert == true) {
                         if (Pushover) sendPushoverNotification(itemInfo);
-                        if (discord) sendWebHookDiscord(Webhook, webhookType = 'IncommingTrade', itemInfo);
+                        if (discord) sendWebHookDiscord(Webhook, webhookType = 'IncommingTrade', trade_info);
                     }
                 }
             }
