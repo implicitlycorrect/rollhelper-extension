@@ -294,13 +294,11 @@ function connectWSS(){
                     }
                     for (const item of itemsList) {
                         if (item.itemID === itemID && item.steamExternalId === externalSteamId) {
-                            if (item.float == float) {
-                                asset = item.assetID
-                                found = true
-                                sendSteamTradeOffer(asset, tradeLink, offerMessage)
-                                console.log(`%c${DateFormater(new Date())} | [ROLLHELPER - Steam offer sent]`, steamOfferCSSlog)
-                                break
-                            }
+                            asset = item.assetID
+                            found = true
+                            sendSteamTradeOffer(asset, tradeLink, offerMessage)
+                            console.log(`%c${DateFormater(new Date())} | [ROLLHELPER - Steam offer sent]`, steamOfferCSSlog)
+                            break
                         }
                     }
 
